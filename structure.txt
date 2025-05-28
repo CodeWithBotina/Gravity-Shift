@@ -1,0 +1,394 @@
+gravity-shift/
+├── README.md
+├── LICENSE
+├── CHANGELOG.md
+├── requirements.txt
+├── requirements-dev.txt
+├── pyproject.toml
+├── setup.py
+├── structure.txt
+├── Dockerfile
+├── .gitignore
+├── .gitlab/
+│   ├── workflows/
+│   │   ├── ci.yml
+│   │   ├── build.yml
+│   │   └── release.yml
+│   ├── ISSUE_TEMPLATE/
+│   │   ├── bug_report.md
+│   │   ├── feature_request.md
+│   │   └── question.md
+│   └── pull_request_template.md
+├── main.py
+├── src/
+│   ├── __init__.py
+│   ├── game/
+│   │   ├── __init__.py
+│   │   ├── core/
+│   │   │   ├── __init__.py
+│   │   │   ├── engine.py
+│   │   │   ├── game_state.py
+│   │   │   ├── scene_manager.py
+│   │   │   ├── input_handler.py
+│   │   │   ├── camera.py
+│   │   │   └── time_manager.py
+│   │   ├── entities/
+│   │   │   ├── __init__.py
+│   │   │   ├── player.py
+│   │   │   ├── enemies/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── reaper_drone.py
+│   │   │   │   └── base_enemy.py
+│   │   │   ├── objects/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── platform.py
+│   │   │   │   ├── collectible.py
+│   │   │   │   ├── generator.py
+│   │   │   │   └── hazard.py
+│   │   │   └── particles/
+│   │   │       ├── __init__.py
+│   │   │       ├── particle_system.py
+│   │   │       ├── debris.py
+│   │   │       └── geyser.py
+│   │   ├── physics/
+│   │   │   ├── __init__.py
+│   │   │   ├── gravity_system.py
+│   │   │   ├── collision_handler.py
+│   │   │   ├── physics_world.py
+│   │   │   └── gravity_field.py
+│   │   ├── levels/
+│   │   │   ├── __init__.py
+│   │   │   ├── base_level.py
+│   │   │   ├── omega_district.py
+│   │   │   ├── cassini_ring.py
+│   │   │   ├── singularity_core.py
+│   │   │   └── level_loader.py
+│   │   ├── ui/
+│   │   │   ├── __init__.py
+│   │   │   ├── menus/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── main_menu.py
+│   │   │   │   ├── pause_menu.py
+│   │   │   │   ├── settings_menu.py
+│   │   │   │   ├── credits_menu.py
+│   │   │   │   └── save_load_menu.py
+│   │   │   ├── hud/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── oxygen_meter.py
+│   │   │   │   ├── health_bar.py
+│   │   │   │   ├── gravity_indicator.py
+│   │   │   │   ├── minimap.py
+│   │   │   │   └── delta_console.py
+│   │   │   ├── components/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── button.py
+│   │   │   │   ├── slider.py
+│   │   │   │   ├── text_box.py
+│   │   │   │   └── progress_bar.py
+│   │   │   └── dialogue/
+│   │   │       ├── __init__.py
+│   │   │       ├── dialogue_system.py
+│   │   │       ├── delta_ai.py
+│   │   │       └── cutscene_manager.py
+│   │   ├── audio/
+│   │   │   ├── __init__.py
+│   │   │   ├── audio_manager.py
+│   │   │   ├── music_player.py
+│   │   │   ├── sfx_player.py
+│   │   │   └── audio_mixer.py
+│   │   ├── graphics/
+│   │   │   ├── __init__.py
+│   │   │   ├── renderer.py
+│   │   │   ├── sprite_manager.py
+│   │   │   ├── animation_system.py
+│   │   │   ├── effects/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── lighting.py
+│   │   │   │   ├── post_processing.py
+│   │   │   │   └── screen_shake.py
+│   │   │   └── tilemap/
+│   │   │       ├── __init__.py
+│   │   │       ├── tile_renderer.py
+│   │   │       └── tilemap_loader.py
+│   │   └── utils/
+│   │       ├── __init__.py
+│   │       ├── math_utils.py
+│   │       ├── file_utils.py
+│   │       ├── config_loader.py
+│   │       ├── save_system.py
+│   │       ├── logger.py
+│   │       └── profiler.py
+├── assets/
+│   ├── sprites/
+│   │   ├── characters/
+│   │   │   ├── alex_rook/
+│   │   │   │   ├── idle.png
+│   │   │   │   ├── walk_cycle.png
+│   │   │   │   ├── jump.png
+│   │   │   │   ├── eva_thrust.png
+│   │   │   │   ├── damaged.png
+│   │   │   │   └── death.png
+│   │   │   └── enemies/
+│   │   │       ├── reaper_drone/
+│   │   │       │   ├── idle.png
+│   │   │       │   ├── patrol.png
+│   │   │       │   ├── attack.png
+│   │   │       │   └── destroyed.png
+│   │   │       └── hazards/
+│   │   │           ├── electrical_arc.png
+│   │   │           ├── debris_field.png
+│   │   │           └── nitrogen_geyser.png
+│   │   ├── environments/
+│   │   │   ├── omega_district/
+│   │   │   │   ├── tileset.png
+│   │   │   │   ├── background_layers/
+│   │   │   │   │   ├── bg_layer_1.png
+│   │   │   │   │   ├── bg_layer_2.png
+│   │   │   │   │   └── bg_layer_3.png
+│   │   │   │   ├── structures/
+│   │   │   │   │   ├── generators.png
+│   │   │   │   │   ├── platforms.png
+│   │   │   │   │   └── terminals.png
+│   │   │   │   └── props/
+│   │   │   │       ├── debris.png
+│   │   │   │       ├── pipes.png
+│   │   │   │       └── lights.png
+│   │   │   ├── cassini_ring/
+│   │   │   │   ├── asteroid_tileset.png
+│   │   │   │   ├── background_space.png
+│   │   │   │   ├── stations/
+│   │   │   │   │   ├── abandoned_station.png
+│   │   │   │   │   └── research_pods.png
+│   │   │   │   └── effects/
+│   │   │   │       ├── gravity_fields.png
+│   │   │   │       └── particle_trails.png
+│   │   │   └── singularity_core/
+│   │   │       ├── ice_platforms.png
+│   │   │       ├── core_chamber.png
+│   │   │       ├── singularity_effect.png
+│   │   │       └── melting_ice.png
+│   │   ├── ui/
+│   │   │   ├── hud/
+│   │   │   │   ├── oxygen_meter.png
+│   │   │   │   ├── health_icons.png
+│   │   │   │   ├── gravity_compass.png
+│   │   │   │   ├── minimap_frame.png
+│   │   │   │   └── delta_portrait.png
+│   │   │   ├── menus/
+│   │   │   │   ├── main_menu_bg.png
+│   │   │   │   ├── button_states.png
+│   │   │   │   ├── slider_components.png
+│   │   │   │   └── menu_frames.png
+│   │   │   ├── icons/
+│   │   │   │   ├── items.png
+│   │   │   │   ├── abilities.png
+│   │   │   │   ├── collectibles.png
+│   │   │   │   └── achievements.png
+│   │   │   └── cursors/
+│   │   │       ├── default.png
+│   │   │       ├── pointer.png
+│   │   │       └── loading.png
+│   │   ├── effects/
+│   │   │   ├── particles/
+│   │   │   │   ├── sparks.png
+│   │   │   │   ├── smoke.png
+│   │   │   │   ├── energy.png
+│   │   │   │   └── debris_bits.png
+│   │   │   ├── lighting/
+│   │   │   │   ├── light_gradients.png
+│   │   │   │   ├── glow_effects.png
+│   │   │   │   └── shadows.png
+│   │   │   └── transitions/
+│   │   │       ├── fade_overlay.png
+│   │   │       ├── wipe_effects.png
+│   │   │       └── portal_effect.png
+│   │   └── logo/
+│   │       ├── gravity_shift_logo.png
+│   │       ├── team_logo.png
+│   │       └── splash_screen.png
+│   ├── audio/
+│   │   ├── music/
+│   │   │   ├── main_theme.ogg
+│   │   │   ├── omega_district_ambient.ogg
+│   │   │   ├── cassini_ring_tension.ogg
+│   │   │   ├── singularity_core_dramatic.ogg
+│   │   │   ├── menu_music.ogg
+│   │   │   ├── credits_music.ogg
+│   │   │   └── game_over.ogg
+│   │   ├── sfx/
+│   │   │   ├── player/
+│   │   │   │   ├── footsteps/
+│   │   │   │   │   ├── metal_step_1.wav
+│   │   │   │   │   ├── metal_step_2.wav
+│   │   │   │   │   └── metal_step_3.wav
+│   │   │   │   ├── eva_thruster.wav
+│   │   │   │   ├── oxygen_warning.wav
+│   │   │   │   ├── heartbeat_low_oxygen.wav
+│   │   │   │   ├── suit_damage.wav
+│   │   │   │   └── death_gasp.wav
+│   │   │   ├── environment/
+│   │   │   │   ├── gravity_shift_whoosh.wav
+│   │   │   │   ├── electrical_buzz.wav
+│   │   │   │   ├── nitrogen_geyser.wav
+│   │   │   │   ├── ice_crack.wav
+│   │   │   │   ├── metal_groan.wav
+│   │   │   │   ├── generator_hum.wav
+│   │   │   │   └── debris_impact.wav
+│   │   │   ├── enemies/
+│   │   │   │   ├── reaper_drone_scan.wav
+│   │   │   │   ├── reaper_drone_attack.wav
+│   │   │   │   ├── reaper_drone_death.wav
+│   │   │   │   └── drone_propulsion.wav
+│   │   │   ├── ui/
+│   │   │   │   ├── button_hover.wav
+│   │   │   │   ├── button_click.wav
+│   │   │   │   ├── menu_transition.wav
+│   │   │   │   ├── error_beep.wav
+│   │   │   │   ├── success_chime.wav
+│   │   │   │   └── notification.wav
+│   │   │   ├── delta_ai/
+│   │   │   │   ├── delta_startup.wav
+│   │   │   │   ├── delta_alert.wav
+│   │   │   │   ├── delta_analysis.wav
+│   │   │   │   └── delta_shutdown.wav
+│   │   │   └── collectibles/
+│   │   │       ├── data_log_pickup.wav
+│   │   │       ├── oxygen_canister.wav
+│   │   │       ├── key_card_scan.wav
+│   │   │       └── achievement_unlock.wav
+│   │   └── voice/
+│   │       ├── delta_dialogue/
+│   │       │   ├── delta_intro.ogg
+│   │       │   ├── delta_sarcasm_1.ogg
+│   │       │   ├── delta_sarcasm_2.ogg
+│   │       │   ├── delta_warning.ogg
+│   │       │   ├── delta_analysis.ogg
+│   │       │   └── delta_farewell.ogg
+│   │       └── narrator/
+│   │           ├── intro_cutscene.ogg
+│   │           ├── level_transitions.ogg
+│   │           └── ending_narration.ogg
+│   ├── fonts/
+│   │   ├── orbitron_regular.ttf
+│   │   ├── orbitron_bold.ttf
+│   │   ├── roboto_mono.ttf
+│   │   └── space_mono.ttf
+│   ├── shaders/
+│   │   ├── gravity_field.glsl
+│   │   ├── lighting.glsl
+│   │   ├── particle_system.glsl
+│   │   └── post_processing.glsl
+│   └── data/
+│       ├── levels/
+│       │   ├── omega_district.tmx
+│       │   ├── cassini_ring.tmx
+│       │   ├── singularity_core.tmx
+│       │   └── tutorial.tmx
+│       ├── dialogue/
+│       │   ├── delta_responses.csv
+│       │   ├── cutscene_scripts.csv
+│       │   └── character_interactions.csv
+│       ├── physics/
+│       │   ├── gravity_constants.csv
+│       │   ├── material_properties.csv
+│       │   └── celestial_bodies.csv
+│       ├── game_data/
+│       │   ├── achievements.json
+│       │   ├── collectibles.json
+│       │   ├── enemy_stats.json
+│       │   └── player_progression.json
+│       └── localization/
+│           ├── en/
+│           │   ├── ui_text.json
+│           │   ├── dialogue.json
+│           │   └── story_text.json
+│           ├── es/
+│           │   ├── ui_text.json
+│           │   ├── dialogue.json
+│           │   └── story_text.json
+│           └── fr/
+│               ├── ui_text.json
+│               ├── dialogue.json
+│               └── story_text.json
+├── config/
+│   ├── settings.yaml
+│   ├── keybindings.yaml
+│   ├── audio_config.yaml
+│   ├── graphics_presets.yaml
+│   └── development.yaml
+├── saves/
+│   ├── .gitkeep
+│   └── default_save.json
+├── logs/
+│   ├── .gitkeep
+│   └── game.log
+├── tests/
+│   ├── __init__.py
+│   ├── test_gravity_system.py
+│   ├── test_player_movement.py
+│   ├── test_collision_detection.py
+│   ├── test_audio_system.py
+│   ├── test_save_system.py
+│   ├── test_level_loading.py
+│   ├── test_ui_components.py
+│   ├── test_delta_ai.py
+│   ├── fixtures/
+│   │   ├── test_levels/
+│   │   │   ├── test_level_1.tmx
+│   │   │   └── test_level_2.tmx
+│   │   ├── test_audio/
+│   │   │   ├── test_sound.wav
+│   │   │   └── test_music.ogg
+│   │   └── test_data/
+│   │       ├── test_save.json
+│   │       └── test_config.yaml
+│   └── integration/
+│       ├── test_full_gameplay.py
+│       ├── test_level_transitions.py
+│       └── test_ending_sequences.py
+├── docs/
+│   ├── index.md
+│   ├── installation.md
+│   ├── gameplay.md
+│   ├── development/
+│   │   ├── architecture.md
+│   │   ├── physics_system.md
+│   │   ├── ai_system.md
+│   │   ├── audio_implementation.md
+│   │   └── level_design.md
+│   ├── api/
+│   │   ├── game_core.md
+│   │   ├── physics.md
+│   │   ├── entities.md
+│   │   └── ui_system.md
+│   └── assets/
+│       ├── art_guide.md
+│       ├── audio_guide.md
+│       └── localization_guide.md
+├── tools/
+│   ├── level_editor/
+│   │   ├── level_editor.py
+│   │   ├── tile_palette.py
+│   │   └── export_tools.py
+│   ├── asset_processor/
+│   │   ├── sprite_packer.py
+│   │   ├── audio_converter.py
+│   │   └── texture_optimizer.py
+│   ├── build_tools/
+│   │   ├── build_game.py
+│   │   ├── package_assets.py
+│   │   └── create_installer.py
+│   └── dev_utils/
+│       ├── performance_profiler.py
+│       ├── memory_analyzer.py
+│       └── debug_overlay.py
+├── scripts/
+│   ├── setup_dev_env.sh
+│   ├── run_tests.sh
+│   ├── build_release.sh
+│   ├── deploy.sh
+│   └── update_dependencies.sh
+├── dist/
+│   └── .gitkeep
+└── build/
+    └── .gitkeep

@@ -1,0 +1,7 @@
+pygame==2.5.2
+pymunk==6.4.0
+numpy==1.24.3
+pygame-menu==4.4.3
+pydub==0.25.1
+Pillow==9.5.0
+PyYAML==6.0

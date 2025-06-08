@@ -2,7 +2,11 @@ import pygame
 import os
 import math
 from .animation_handler import AnimationHandler
-from ..config.settings import GRAVITY, SCREEN_WIDTH, SCREEN_HEIGHT, MAX_SPEED, ROTATION_SPEED, THRUST_POWER, TILE_SIZE
+from ..config.settings import (
+    GRAVITY, SCREEN_WIDTH, SCREEN_HEIGHT, MAX_SPEED, ROTATION_SPEED, 
+    THRUST_POWER, TILE_SIZE, JUMP_SPEED, MAX_FALL_SPEED, JUMP_CUT_MULTIPLIER,
+    COYOTE_TIME, JUMP_BUFFER, AIR_CONTROL
+)
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y, scale, speed, ammo, grenades):
@@ -14,13 +18,21 @@ class Player(pygame.sprite.Sprite):
         self.health = 100
         self.max_health = self.health
         self.position = pygame.math.Vector2(x, y)
-        self.velocity = pygame.math.Vector2(0, 0)  # Add velocity for physics
+        self.velocity = pygame.math.Vector2(0, 0)
         self.direction = 1
         self.flip = False
+        
+        # Jump variables
         self.in_air = False
         self.jump = False
-        self.vel_y = 0  # Initialize vertical velocity
-        self.world = None  # Initialize the world attribute
+        self.jumping = False
+        self.jump_time = 0
+        self.coyote_timer = 0
+        self.jump_buffer_timer = 0
+        self.can_jump = True
+        self.just_jumped = False
+        
+        self.world = None
         
         # Animation setup
         self.animation_handler = AnimationHandler()
@@ -39,33 +51,62 @@ class Player(pygame.sprite.Sprite):
         self.max_speed = MAX_SPEED
 
         # Physics properties
-        self.gravity = 0.5  # Gravity constant
-        self.jump_force = -10  # Jump force
-        self.on_ground = False  # Track if the player is on the ground
+        self.gravity = GRAVITY  # Use global gravity constant
+        self.jump_force = -12  # Jump force increased for better feel
+        self.on_ground = True  # Start on the ground by default
+        self.in_air = False  # Not in air initially
 
     def update(self):
         dx = 0
-        dy = self.velocity.y  # Use velocity for vertical movement
+        dy = self.velocity.y
 
         # Get input from input manager
         keys = pygame.key.get_pressed()
+        
+        # Horizontal movement
         if keys[pygame.K_a]:  # Move left
-            dx = -self.speed
+            dx = -self.speed * (AIR_CONTROL if self.in_air else 1)
             self.flip = True
             self.direction = -1
         elif keys[pygame.K_d]:  # Move right
-            dx = self.speed
+            dx = self.speed * (AIR_CONTROL if self.in_air else 1)
             self.flip = False
             self.direction = 1
+            
+        # Jump input buffer
+        if keys[pygame.K_SPACE]:
+            self.jump_buffer_timer = JUMP_BUFFER
+        elif self.jump_buffer_timer > 0:
+            self.jump_buffer_timer -= 1
 
-        if keys[pygame.K_SPACE] and self.on_ground:  # Jump logic
-            self.velocity.y = self.jump_force
-            self.on_ground = False
-
-        # Apply gravity
+        # Coyote time and jump logic
         if not self.on_ground:
-            self.velocity.y += self.gravity
+            if self.coyote_timer > 0:
+                self.coyote_timer -= 1
+        else:
+            self.coyote_timer = COYOTE_TIME
+            self.can_jump = True
+            
+        # Initiate jump
+        if self.jump_buffer_timer > 0 and (self.on_ground or self.coyote_timer > 0) and self.can_jump:
+            self.velocity.y = JUMP_SPEED
+            self.jumping = True
+            self.on_ground = False
+            self.in_air = True
+            self.can_jump = False
+            self.jump_buffer_timer = 0
+            self.coyote_timer = 0
+            self.just_jumped = True
+            
+        # Variable jump height
+        if not keys[pygame.K_SPACE] and self.velocity.y < 0 and self.jumping:
+            self.velocity.y *= JUMP_CUT_MULTIPLIER
+            self.jumping = False
 
+        # Apply gravity with terminal velocity
+        if not self.on_ground:
+            self.velocity.y = min(self.velocity.y + GRAVITY, MAX_FALL_SPEED)
+        
         dy = self.velocity.y
 
         # Check collisions

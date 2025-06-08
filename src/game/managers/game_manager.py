@@ -164,12 +164,19 @@ class GameManager:
         # Create world data with default platform and player spawn
         self.world_data = [[-1] * COLS for _ in range(ROWS)]
         
-        # Add ground
+        # Add solid ground platform
         for x in range(COLS):
+            # Ground layer is solid (tile type 0)
             self.world_data[ROWS-1][x] = 0
             
-        # Add player spawn position (moved up one tile from ground)
-        self.world_data[ROWS-2][1] = 15  # 15 is the player tile ID
+        # Add player spawn position one tile above ground
+        # Add a few solid blocks as starting platform
+        start_platform_length = 5
+        for x in range(start_platform_length):
+            self.world_data[ROWS-2][x] = 0  # Solid platform
+            
+        # Place player on the starting platform
+        self.world_data[ROWS-3][1] = 15  # Player tile ID
         
         # Create world and process data
         self.world = World()  # Initialize world object
@@ -342,29 +349,35 @@ class GameManager:
             self.player.update_action(0)  # Idle animation
 
     def draw_game(self):
-        self.screen.fill((0, 0, 0))  # Clear screen
+        # Clear screen with background color
+        self.screen.fill(BG)
         
-        # Draw background first
+        # Draw background layers first
         self.background_manager.draw(self.screen)
         
         # Draw world elements with camera offset
         if self.world:
+            # Asegurarse de que la cámara esté actualizada
+            if self.player:
+                self.camera.update(self.player, self.world.level_length * TILE_SIZE)
+            # Dibujar el mundo con el scroll de la cámara
             self.world.draw(self.screen, self.camera.scroll)
         
-        # Draw platforms only if they exist
-        if hasattr(self, 'platforms'):
-            for platform in self.platforms:
-                platform_pos = self.camera.apply(platform)
-                self.screen.blit(platform.surface, platform_pos)
+        # Draw sprite groups with camera offset
+        for group in self.sprite_groups.values():
+            for sprite in group:
+                sprite_pos = self.camera.apply(sprite)
+                self.screen.blit(sprite.image, sprite_pos)
 
-        # Draw player with camera offset
-        if self.player:
+        # Draw player with camera offset if alive
+        if self.player and self.player.alive:
             player_pos = self.camera.apply(self.player)
-            self.screen.blit(self.player.image, player_pos)
+            self.screen.blit(pygame.transform.flip(self.player.image, self.player.flip, False), player_pos)
         
         # Draw HUD last (no camera offset)
         self.hud.update(self.player, self.oxygen_level)
         
+        # Update the display
         pygame.display.flip()
 
     def handle_death_screen(self):
@@ -439,29 +452,35 @@ class GameManager:
             self.player.world = self.world
 
     def draw_game(self):
-        self.screen.fill((0, 0, 0))  # Clear screen
+        # Clear screen with background color
+        self.screen.fill(BG)
         
-        # Draw background first
+        # Draw background layers first
         self.background_manager.draw(self.screen)
         
         # Draw world elements with camera offset
         if self.world:
+            # Asegurarse de que la cámara esté actualizada
+            if self.player:
+                self.camera.update(self.player, self.world.level_length * TILE_SIZE)
+            # Dibujar el mundo con el scroll de la cámara
             self.world.draw(self.screen, self.camera.scroll)
         
-        # Draw platforms only if they exist
-        if hasattr(self, 'platforms'):
-            for platform in self.platforms:
-                platform_pos = self.camera.apply(platform)
-                self.screen.blit(platform.surface, platform_pos)
+        # Draw sprite groups with camera offset
+        for group in self.sprite_groups.values():
+            for sprite in group:
+                sprite_pos = self.camera.apply(sprite)
+                self.screen.blit(sprite.image, sprite_pos)
 
-        # Draw player with camera offset
-        if self.player:
+        # Draw player with camera offset if alive
+        if self.player and self.player.alive:
             player_pos = self.camera.apply(self.player)
-            self.screen.blit(self.player.image, player_pos)
+            self.screen.blit(pygame.transform.flip(self.player.image, self.player.flip, False), player_pos)
         
         # Draw HUD last (no camera offset)
         self.hud.update(self.player, self.oxygen_level)
         
+        # Update the display
         pygame.display.flip()
 
     def initialize_level(self):

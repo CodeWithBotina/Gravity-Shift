@@ -6,6 +6,17 @@ SCREEN_WIDTH = 800
 SCREEN_HEIGHT = int(SCREEN_WIDTH * 0.8)
 FPS = 60
 
+# UI settings
+MENU_CENTER_X = SCREEN_WIDTH // 2
+MENU_CENTER_Y = SCREEN_HEIGHT // 2
+BUTTON_WIDTH = 200
+BUTTON_HEIGHT = 50
+BUTTON_MARGIN = 20
+MENU_BG = (50, 50, 70)  # Dark blue-gray
+BUTTON_BG = (100, 100, 120)  # Light blue-gray
+BUTTON_HOVER = (120, 120, 140)  # Lighter blue-gray
+BUTTON_TEXT = (255, 255, 255)  # White
+
 # Tile settings
 TILE_SIZE = 64
 TILE_TYPES = 21  # Total number of different tile types
@@ -19,7 +30,14 @@ CAMERA_OFFSET_X = SCREEN_WIDTH // 2  # Center point for camera
 CAMERA_DEADZONE = 100  # Area where camera won't move
 
 # Game physics
-GRAVITY = 0.75
+GRAVITY = 0.6  # Reduced gravity for smoother fall
+JUMP_SPEED = -11  # Initial jump velocity
+MAX_FALL_SPEED = 10  # Maximum falling speed
+JUMP_CUT_MULTIPLIER = 0.4  # How much to cut jump when button is released
+COYOTE_TIME = 6  # Frames of time where player can still jump after leaving ground
+JUMP_BUFFER = 6  # Frames of time where jump input is buffered
+AIR_CONTROL = 0.8  # How much control player has in air (1 = full control)
+
 # Modify scroll threshold to be center-based
 SCROLL_THRESH = SCREEN_WIDTH // 4  # Distance from center before scrolling
 

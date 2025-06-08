@@ -39,10 +39,19 @@ class ResourceManager:
             for name in ['pine1', 'pine2', 'mountain', 'sky_cloud', 'cloud']
         }
         # Load tiles
-        self.images['tiles'] = [
-            pygame.transform.scale(self._load_image(f'assets/sprites/environments/omega_district/structures/{x}.png'), (TILE_SIZE, TILE_SIZE))
-            for x in range(TILE_TYPES)
-        ]
+        self.images['tiles'] = []
+        for x in range(TILE_TYPES):
+            try:
+                img = self._load_image(f'assets/sprites/environments/omega_district/structures/{x}.png')
+                if img:
+                    img = pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE))
+                    self.images['tiles'].append(img)
+                else:
+                    logging.warning(f"Failed to load tile image {x}")
+                    self.images['tiles'].append(None)
+            except Exception as e:
+                logging.error(f"Error loading tile {x}: {e}")
+                self.images['tiles'].append(None)
         # Load UI images
         ui_path = 'assets/sprites/ui/menus'
         self.images['ui'] = {

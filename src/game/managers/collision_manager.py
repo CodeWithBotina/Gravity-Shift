@@ -17,14 +17,25 @@ class CollisionManager:
 
         # Vertical collision
         entity.rect.y += dy
+        collision_below = False
+        
         for tile in world.obstacle_list:
             if tile[1].colliderect(entity.rect):
                 if dy > 0:  # Falling down
                     entity.rect.bottom = tile[1].top
-                    entity.in_air = False
-                else:
-                    entity.in_air = True  # Ensure entity is marked as in-air when not colliding
-                dy = 0  # Stop vertical movement
+                    collision_below = True
+                    dy = 0  # Stop vertical movement
+                elif dy < 0:  # Moving up
+                    entity.rect.top = tile[1].bottom
+                    dy = 0  # Stop vertical movement and allow falling
+                    entity.velocity.y = 0  # Reset vertical velocity on head collision
+        
+        # Update in_air state based on collision below
+        entity.in_air = not collision_below
+        entity.on_ground = collision_below
+
+        if collision_below:
+            entity.velocity.y = 0  # Reset vertical velocity when landing
 
         return dx, dy
 

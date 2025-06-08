@@ -34,10 +34,13 @@ class World:
                             from ..entities.player import Player
                             spawn_x = x * TILE_SIZE
                             spawn_y = y * TILE_SIZE
+                            # Create player at the correct position
                             player = Player(spawn_x, spawn_y, 1.65, 5, 20, 5)
+                            # Set the bottom of the player to the bottom of the tile
                             player.rect.x = spawn_x
-                            player.rect.y = spawn_y
-                            player.position = pygame.math.Vector2(spawn_x, spawn_y)
+                            player.rect.bottom = spawn_y + TILE_SIZE
+                            # Update the position vector to match the rect
+                            player.position = pygame.math.Vector2(player.rect.centerx, player.rect.centery)
                             player.world = self
                             health_bar = HealthBar(10, 10, player.health, player.health)
 
@@ -48,6 +51,11 @@ class World:
 
     def draw(self, surface, scroll):
         for tile in self.obstacle_list:
+            if not tile[0] or not tile[1]:  # Verificar que el tile existe
+                continue
             tile_rect = tile[1].copy()  # Create a copy of the rect for drawing
-            tile_rect.x += scroll.x  # Apply scroll to copy
-            surface.blit(tile[0], tile_rect)  # Draw using the adjusted rect
+            tile_rect.x -= scroll.x  # Aplicar scroll negativo para mover el mundo en la dirección opuesta
+            tile_rect.y -= scroll.y
+            # Solo dibujar los tiles que están en pantalla
+            if tile_rect.right > 0 and tile_rect.left < surface.get_width():
+                surface.blit(tile[0], tile_rect)  # Draw using the adjusted rect

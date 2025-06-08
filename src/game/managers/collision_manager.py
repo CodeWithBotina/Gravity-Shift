@@ -1,5 +1,5 @@
 import pygame
-from ..config.settings import TILE_SIZE
+from ..config.settings import TILE_SIZE, SCREEN_WIDTH
 
 class CollisionManager:
     @staticmethod
@@ -10,9 +10,10 @@ class CollisionManager:
             if tile[1].colliderect(entity.rect):
                 if dx > 0:  # Moving right
                     entity.rect.right = tile[1].left
+                    dx = 0  # Stop horizontal movement
                 elif dx < 0:  # Moving left
                     entity.rect.left = tile[1].right
-                dx = 0  # Stop horizontal movement
+                    dx = 0  # Stop horizontal movement
 
         # Vertical collision
         entity.rect.y += dy
@@ -21,15 +22,9 @@ class CollisionManager:
                 if dy > 0:  # Falling down
                     entity.rect.bottom = tile[1].top
                     entity.in_air = False
-                elif dy < 0:  # Jumping up
-                    entity.rect.top = tile[1].bottom
+                else:
+                    entity.in_air = True  # Ensure entity is marked as in-air when not colliding
                 dy = 0  # Stop vertical movement
-
-        # Prevent falling off the map
-        if entity.rect.bottom > world.level_length * TILE_SIZE:
-            entity.rect.bottom = world.level_length * TILE_SIZE
-            entity.in_air = False
-            dy = 0
 
         return dx, dy
 

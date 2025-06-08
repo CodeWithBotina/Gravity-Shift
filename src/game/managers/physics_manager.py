@@ -24,7 +24,7 @@ class PhysicsManager:
         collision_types = {'top': False, 'bottom': False, 'right': False, 'left': False}
         dx = entity.velocity.x
         dy = entity.velocity.y
-        
+
         # Check x direction collision
         entity.rect.x += dx
         for tile in world.obstacle_list:
@@ -36,7 +36,7 @@ class PhysicsManager:
                     entity.rect.left = tile[1].right
                     collision_types['left'] = True
                 dx = 0
-        
+
         # Check y direction collision
         entity.rect.y += dy
         for tile in world.obstacle_list:
@@ -49,18 +49,11 @@ class PhysicsManager:
                     entity.rect.top = tile[1].bottom
                     collision_types['top'] = True
                 dy = 0
-        
-        # Prevent falling off the map
-        if entity.rect.bottom > world.level_length * TILE_SIZE:
-            entity.rect.bottom = world.level_length * TILE_SIZE
-            collision_types['bottom'] = True
-            entity.in_air = False
-            dy = 0
-        
+
         # Update entity velocity
         entity.velocity.x = dx
         entity.velocity.y = dy
-        
+
         return collision_types
 
     def _limit_velocity(self, entity):

@@ -1,19 +1,18 @@
 import pygame
-import logging
-from ..config.settings import TILE_SIZE, img_list, SCREEN_WIDTH
-from ..entities.soldier import Soldier
-from ..entities.player import Player  # Add this import
-from ..entities.sprites import Water, Decoration
-from ..ui.hud.components import HealthBar  # Updated import path
-from ..managers.physics_manager import PhysicsManager  # Add this import
-from ..managers.collision_manager import CollisionManager  # Add this import
+from src.game.config.settings import TILE_SIZE, img_list
+from src.game.managers.collision_manager import CollisionManager
+from src.game.managers.physics_manager import PhysicsManager
+from src.game.entities.sprites import Water, Decoration  # Add sprites import
+from src.game.ui.components.health_bar import HealthBar  # Add HealthBar import
 
 class World:
     def __init__(self):
         self.obstacle_list = []
         self.level_length = 0
-        self.physics_manager = PhysicsManager()
+        self.scroll_x = 0
+        self.tile_images = img_list  # Store reference to loaded images
         self.collision_manager = CollisionManager()  # Initialize collision manager
+        self.physics_manager = PhysicsManager()  # Initialize physics manager
 
     def process_data(self, data, sprite_groups):
         self.level_length = len(data[0])
@@ -23,44 +22,32 @@ class World:
 
         for y, row in enumerate(data):
             for x, tile in enumerate(row):
-                if tile >= 0:
-                    img = img_list[tile]
-                    img_rect = img.get_rect()
-                    img_rect.x = x * TILE_SIZE
-                    img_rect.y = y * TILE_SIZE
-                    tile_data = (img, img_rect)
+                if tile >= 0 and tile < len(self.tile_images):
+                    img = self.tile_images[tile]
+                    if img:
+                        img_rect = pygame.Rect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+                        tile_data = (img, img_rect)
 
-                    if tile >= 0 and tile <= 8:
-                        self.obstacle_list.append(tile_data)
-                    elif tile >= 9 and tile <= 10:
-                        sprite_groups['water'].add(Water(img, x * TILE_SIZE, y * TILE_SIZE))
-                    elif tile >= 11 and tile <= 14:
-                        sprite_groups['decoration'].add(Decoration(img, x * TILE_SIZE, y * TILE_SIZE))
-                    elif tile == 15:  # Player spawn
-                        player = Player(x * TILE_SIZE, y * TILE_SIZE, 1.65, 5, 20, 5)
-                        player.world = self  # Give player reference to world
-                        health_bar = HealthBar(10, 10, player.health, player.max_health)
-                    elif tile == 16:
-                        enemy = Soldier('enemies/reaper_drone', x * TILE_SIZE, y * TILE_SIZE, 1.65, 2, 20, 0)
-                        sprite_groups['enemy'].add(enemy)
+                        if tile <= 8:  # Solid tiles
+                            self.obstacle_list.append(tile_data)
+                        elif tile == 15:  # Player spawn
+                            from ..entities.player import Player
+                            spawn_x = x * TILE_SIZE
+                            spawn_y = y * TILE_SIZE
+                            player = Player(spawn_x, spawn_y, 1.65, 5, 20, 5)
+                            player.rect.x = spawn_x
+                            player.rect.y = spawn_y
+                            player.position = pygame.math.Vector2(spawn_x, spawn_y)
+                            player.world = self
+                            health_bar = HealthBar(10, 10, player.health, player.health)
 
         return player, health_bar
 
+    def check_collision(self, entity, dx, dy):
+        return self.collision_manager.check_collision_with_tiles(entity, dx, dy, self)
+
     def draw(self, surface, scroll):
-        if not surface:
-            logging.error("Invalid surface in World.draw")
-            return
-            
-        # Add boundary check for level edges
-        if scroll > 0:  # Moving left
-            if self.obstacle_list and self.obstacle_list[0][1].x >= 0:
-                scroll = 0
-        elif scroll < 0:  # Moving right
-            if self.obstacle_list:
-                rightmost = max(tile[1].right for tile in self.obstacle_list)
-                if rightmost <= SCREEN_WIDTH:
-                    scroll = 0
-                    
         for tile in self.obstacle_list:
-            tile[1].x += scroll
-            surface.blit(tile[0], tile[1])
+            tile_rect = tile[1].copy()  # Create a copy of the rect for drawing
+            tile_rect.x += scroll.x  # Apply scroll to copy
+            surface.blit(tile[0], tile_rect)  # Draw using the adjusted rect

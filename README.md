@@ -76,10 +76,11 @@ This project leverages Python's robust ecosystem for game development:
 
 ### Development Tools
 
-- **[pytest](https://pytest.org)** - Testing framework
-- **[black](https://black.readthedocs.io)** - Code formatting
-- **[flake8](https://flake8.pycqa.org)** - Code linting
-- **[mypy](https://mypy.readthedocs.io)** - Static type checking
+- **pytest**: Testing framework
+- **black**: Code formatting
+- **flake8**: Code linting
+- **mypy**: Static type checking
+- **pre-commit**: Automates code quality checks
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 

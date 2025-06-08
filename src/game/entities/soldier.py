@@ -69,21 +69,17 @@ class Soldier(pygame.sprite.Sprite):
         self.current_gravity = self.default_gravity
 
     def move(self, moving_left, moving_right, world):
-        screen_scroll = 0
-        dx = 0
-        dy = 0
+        dx, dy = 0, self.vel_y
         self.moving_left = moving_left
         self.moving_right = moving_right
 
         # Basic movement
         if moving_left:
             dx = -self.speed
-            self.flip = True
-            self.direction = -1
+            self.flip, self.direction = True, -1
         if moving_right:
             dx = self.speed
-            self.flip = False
-            self.direction = 1
+            self.flip, self.direction = False, 1
 
         # Jumping
         if self.jump and not self.in_air:
@@ -120,14 +116,7 @@ class Soldier(pygame.sprite.Sprite):
             self.health = 0
             dy = 0
 
-        # Update camera scroll for player
-        if self.char_type == 'player':
-            if ((self.rect.right > SCREEN_WIDTH - SCROLL_THRESH and dx > 0) or 
-                (self.rect.left < SCROLL_THRESH and dx < 0)):
-                self.rect.x -= dx
-                screen_scroll = -dx
-
-        return screen_scroll
+        return dx, dy
 
     def check_alive(self):
         if self.health <= 0:

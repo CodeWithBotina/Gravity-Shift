@@ -3,16 +3,14 @@ import sys
 import logging
 import os
 from pygame import mixer
-from .managers.game_manager import GameManager
-from .managers.level_manager import LevelManager
-from .managers.input_manager import InputManager
-from .managers.sprite_manager import SpriteManager
-from .managers.background_manager import BackgroundManager
-from .managers.resource_manager import ResourceManager
-from .constants.game_states import GameState as GameStateEnum  # Add this import
-from .entities.world import World
-from .audio.audio import Audio
-from .config.settings import *
+from src.game.managers.game_manager import GameManager
+from src.game.managers.input_manager import InputManager  # Import InputManager
+from src.game.managers.level_manager import LevelManager  # Import LevelManager
+from src.game.managers.resource_manager import ResourceManager  # Import ResourceManager
+from src.game.managers.sprite_manager import SpriteManager  # Import SpriteManager
+from src.game.managers.background_manager import BackgroundManager  # Import BackgroundManager
+from src.game.constants.game_states import GameState as GameStateEnum  # Import GameStateEnum
+from src.game.config.settings import SCREEN_WIDTH, SCREEN_HEIGHT, BG, load_assets
 
 class GameAPI:
     def __init__(self):

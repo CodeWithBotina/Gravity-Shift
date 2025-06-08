@@ -25,59 +25,29 @@ class ResourceManager:
             'assets/sprites/characters',
             'assets/audio/sfx/collectibles'
         ]
-        
-        # Verify paths exist
         for path in required_paths:
             if not os.path.exists(path):
                 raise FileNotFoundError(f"Required resource path not found: {path}")
-        
-        # Load resources
         self._load_images()
         self._load_sounds()
 
-        # Create default resources if not found
-        if not os.path.exists('assets/data/levels/level1_data.csv'):
-            self._create_default_level()
-            
-    def _create_default_level(self):
-        """Create a default level file if none exists"""
-        os.makedirs('assets/data/levels', exist_ok=True)
-        level_data = [[-1] * COLS for _ in range(ROWS)]
-        
-        # Add basic level structure
-        for x in range(COLS):
-            level_data[ROWS-1][x] = 0  # Ground
-        level_data[ROWS-2][1] = 15     # Player spawn
-        
-        # Save default level
-        with open('assets/data/levels/level1_data.csv', 'w', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerows(level_data)
-
     def _load_images(self):
-        # Background images
+        # Load background images
         bg_path = 'assets/sprites/environments/omega_district/background_layers'
         self.images['background'] = {
-            'pine1': self._load_image(f'{bg_path}/pine1.png'),
-            'pine2': self._load_image(f'{bg_path}/pine2.png'),
-            'mountain': self._load_image(f'{bg_path}/mountain.png'),
-            'sky': self._load_image(f'{bg_path}/sky_cloud.png'),
-            'saturn': self._load_image(f'{bg_path}/cloud.png')
+            name: self._load_image(f'{bg_path}/{name}.png')
+            for name in ['pine1', 'pine2', 'mountain', 'sky_cloud', 'cloud']
         }
-
-        # Tiles
-        self.images['tiles'] = []
-        for x in range(TILE_TYPES):
-            path = f'assets/sprites/environments/omega_district/structures/{x}.png'
-            img = self._load_image(path)
-            self.images['tiles'].append(pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE)))
-
-        # Add UI images loading
+        # Load tiles
+        self.images['tiles'] = [
+            pygame.transform.scale(self._load_image(f'assets/sprites/environments/omega_district/structures/{x}.png'), (TILE_SIZE, TILE_SIZE))
+            for x in range(TILE_TYPES)
+        ]
+        # Load UI images
         ui_path = 'assets/sprites/ui/menus'
         self.images['ui'] = {
-            'start_btn': self._load_image(f'{ui_path}/start_btn.png'),
-            'exit_btn': self._load_image(f'{ui_path}/exit_btn.png'),
-            'restart_btn': self._load_image(f'{ui_path}/restart_btn.png')
+            name: self._load_image(f'{ui_path}/{name}.png')
+            for name in ['start_btn', 'exit_btn', 'restart_btn']
         }
 
     def _load_image(self, path):

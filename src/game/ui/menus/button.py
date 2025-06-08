@@ -1,5 +1,8 @@
 import pygame
-from ...config.settings import *
+from ...config.settings import (
+    BUTTON_WIDTH, BUTTON_HEIGHT, BUTTON_BG,
+    BUTTON_HOVER, BUTTON_TEXT
+)
 
 class Button:
     def __init__(self, x, y, text, width=BUTTON_WIDTH, height=BUTTON_HEIGHT):

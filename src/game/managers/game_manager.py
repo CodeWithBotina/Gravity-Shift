@@ -1,6 +1,7 @@
 import pygame
 import csv
 import logging
+import sys
 import os
 from ..ui.menus.button import Button
 from ..entities.sprites import Grenade
@@ -12,11 +13,7 @@ from ..ui.hud.hud import HUD
 from .level_manager import LevelManager
 from ..constants.game_states import GameState as GameStateEnum  # Rename import
 from .game_state import GameState as GameStateManager  # Add this import
-from ..config.settings import (
-    SCREEN_WIDTH, SCREEN_HEIGHT, OXYGEN_MAX,
-    bullet_img, grenade_img, ROWS, COLS,
-    BG, PINK, img_list
-)
+from ..config.settings import SCREEN_WIDTH, SCREEN_HEIGHT, OXYGEN_MAX, bullet_img, grenade_img, ROWS, COLS, BG, PINK, img_list, TILE_SIZE
 from .camera import Camera
 from .ui_manager import UIManager
 from ..managers.resource_manager import ResourceManager  # Import ResourceManager
@@ -152,8 +149,11 @@ class GameManager:
                             if x < COLS and y < ROWS:
                                 self.world_data[y][x] = int(tile)
 
-            self.world = World()
+            # Ensure world is initialized
+            self.world = World()  # Initialize world object
             self.player, self.health_bar = self.world.process_data(self.world_data, self.sprite_groups)
+            if self.player:
+                self.player.world = self.world  # Assign world to player
             return True
         except Exception as e:
             logging.error(f"Error loading level: {e}")
@@ -168,14 +168,16 @@ class GameManager:
         for x in range(COLS):
             self.world_data[ROWS-1][x] = 0
             
-        # Add player spawn position
+        # Add player spawn position (moved up one tile from ground)
         self.world_data[ROWS-2][1] = 15  # 15 is the player tile ID
         
         # Create world and process data
-        self.world = World()
+        self.world = World()  # Initialize world object
         self.player, self.health_bar = self.world.process_data(self.world_data, self.sprite_groups)
-        
-        if not self.player:
+        if self.player:
+            self.player.world = self.world  # Assign world to player
+            self.player.on_ground = False  # Ensure player starts affected by gravity
+        else:
             from ..entities.player import Player
             # Create default player if processing fails
             self.player = Player(
@@ -186,6 +188,7 @@ class GameManager:
                 ammo=20,
                 grenades=5
             )
+            self.player.world = self.world  # Assign world to player
 
     def init_with_dependencies(self, player, world):
         self.player = player
@@ -277,6 +280,10 @@ class GameManager:
 
     def game_update(self):
         try:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.shutdown_game()  # Ensure the game shuts down properly
+
             if not self.player or not self.player.alive:
                 logging.info("Player is dead, handling death screen...")
                 self.handle_death_screen()
@@ -287,10 +294,15 @@ class GameManager:
 
             # Update player position and animation
             self.player.update()
-            
+            self.player.world = self.world  # Set the player's world attribute
+
             # Update camera to follow player
             if self.player:
-                self.camera.update(self.player)
+                self.camera.update(self.player, self.world.level_length * TILE_SIZE)
+
+            # Ensure player is not restricted unnecessarily
+            if self.player.rect.right > self.world.level_length * TILE_SIZE:
+                self.player.rect.right = self.world.level_length * TILE_SIZE
 
             # Draw game state
             self.draw_game()
@@ -465,3 +477,9 @@ class GameManager:
         # Reset player position
         self.player.position.x = 100
         self.player.position.y = self.screen.get_height() - 100
+
+    def shutdown_game(self):
+        """Handle game shutdown logic."""
+        logging.info("Shutting down game...")
+        pygame.quit()
+        sys.exit()

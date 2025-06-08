@@ -2,21 +2,15 @@ import pygame
 from ..config.settings import SCREEN_WIDTH, SCREEN_HEIGHT, SCROLL_THRESH
 
 class Camera:
-    def __init__(self, width, height):
-        self.camera = pygame.Rect(0, 0, width, height)
-        self.width = width
-        self.height = height
-        self.scroll = 0
+    def __init__(self, screen_width, screen_height):
+        self.scroll = pygame.math.Vector2(0, 0)
+        self.screen_width = screen_width
+        self.screen_height = screen_height
 
     def apply(self, entity):
-        return entity.rect.move((-self.scroll, 0))
+        return entity.rect.move((-self.scroll.x, -self.scroll.y))
 
-    def update(self, target):
-        # Target is typically the player
-        if target.rect.right > SCREEN_WIDTH - SCROLL_THRESH:
-            self.scroll += (target.rect.right - (SCREEN_WIDTH - SCROLL_THRESH))
-        elif target.rect.left < SCROLL_THRESH:
-            self.scroll -= (SCROLL_THRESH - target.rect.left)
-
-        # Keep camera within bounds
-        self.scroll = max(0, min(self.scroll, SCREEN_WIDTH))
+    def update(self, player, level_width):
+        # Center the camera on the player
+        self.scroll.x = max(0, min(player.rect.centerx - self.screen_width // 2, level_width - self.screen_width))
+        self.scroll.y = max(0, min(player.rect.centery - self.screen_height // 2, level_width - self.screen_height))
